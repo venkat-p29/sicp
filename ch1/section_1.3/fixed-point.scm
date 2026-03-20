@@ -1,5 +1,5 @@
 ; ---------------------------------
-; Covers exercises 1.35 to
+; Covers exercises 1.35 to 1.39
 ; ---------------------------------
 
 
@@ -87,3 +87,48 @@
             result
             (iter (- i 1) (/ (n i) (+ (d i) result)))))
     (iter k 0))
+
+
+
+; ---------------------------------
+; Exercise 1.38
+; ---------------------------------
+
+(define (e-n i) 1.0)
+
+(define (e-d i) 
+    (define (is-series? x)
+        (= 0 (modulo (- x 5) 3)))
+    (cond ((= i 1) 1)
+          ((= i 2) 2)
+          ((is-series? i) (* (+ (/ (- i 5) 3) 2) 2))
+          (else 1)))
+
+(define (euler-e k)
+    (+ 2 (cont-frac e-n e-d k)))
+
+
+
+; ---------------------------------
+; Exercise 1.39
+; ---------------------------------
+
+(define (tan-cf x k)
+    (define (n-tan i)
+        (if (= i 1)
+            x
+            (* x x)))
+
+    (define (d-tan i)
+        (- (* 2 i) 1))
+
+
+    ; Changing + to - for tan function
+    (define (iter-cont-f n d k)
+        (define (iter i result)
+            (if (< i 1)
+                result
+                (iter (- i 1) (/ (n i) (- (d i) result)))))
+        (iter k 0))
+
+    (iter-cont-f n-tan d-tan k))
