@@ -1,3 +1,8 @@
+; ---------------------------------
+; Covers exercises 1.29 to 1.33
+; ---------------------------------
+
+
 (load "../section_1.2/prime-num-test.scm")
 
 
@@ -135,7 +140,7 @@
 
 
 ; ---------------------------------
-; Exercise 1.32 - filtered-accumulate
+; Exercise 1.33 - filtered-accumulate
 ; ---------------------------------
 
 (define (filtered-accumulate filter-by combiner null-value term a next b)
