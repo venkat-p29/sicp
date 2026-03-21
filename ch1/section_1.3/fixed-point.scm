@@ -1,5 +1,5 @@
 ; ---------------------------------
-; Covers exercises 1.35 to 1.39
+; Covers exercises 1.35 to 1.46
 ; ---------------------------------
 
 
@@ -132,3 +132,138 @@
         (iter k 0))
 
     (iter-cont-f n-tan d-tan k))
+
+
+
+; ---------------------------------
+; Newton's Method
+; ---------------------------------
+
+(define (square x) (* x x))
+
+(define (deriv g)
+    (lambda (x) (/ (- (g (+ x dx)) (g x)) dx)))
+
+(define dx 0.00001)
+
+(define (newton-transform g)
+    (lambda (x) (- x (/ (g x) ((deriv g) x)))))
+
+
+; Newton's Method
+(define (newtons-method g guess)
+    (fixed-point (newton-transform g) guess))
+
+
+; General fixed-point procedure
+(define (fixed-point-of-transform g transform guess)
+    (fixed-point (transform g) guess))
+
+
+; so now sqrt can be expressed as
+(define (sqrt-avg-damp x)
+    (fixed-point-of-transform
+        (lambda (y) (/ x y)) average-damp 1.0))
+
+(define (sqrt-newtons x)
+    (fixed-point-of-transform
+        (lambda (y) (- (square y) x)) newton-transform 1.0))
+
+
+
+; ---------------------------------
+; Exercise 1.40
+; ---------------------------------
+
+(define (cube x) (* x x x))
+
+(define (cubic a b c)
+    (lambda (x) (+ (cube x) (* a (square x)) (* b x) c)))
+
+(define (cubic-roots-f a b c)
+    (newtons-method (cubic a b c) 1))
+
+
+
+; ---------------------------------
+; Exercise 1.41
+; ---------------------------------
+
+(define (inc x) (+ x 1))
+
+(define (double f)
+    (lambda (x) (f (f x))))
+
+
+
+; ---------------------------------
+; Exercise 1.42
+; ---------------------------------
+
+(define (compose f g)
+    (lambda (x) (f (g x))))
+
+
+
+; ---------------------------------
+; Exercise 1.43
+; ---------------------------------
+
+(define (repeated f n)
+    (define (apply g i)
+        (if (= i 1)
+            g
+            (apply (compose f g) (- i 1))))
+    (apply f n))
+
+
+; recursive version
+(define (repeated-recur f n)
+    (if (= n 1)
+        f
+        (compose f (repeated-recur f (- n 1)))))
+
+
+
+; ---------------------------------
+; Exercise 1.44
+; ---------------------------------
+
+(define (smooth f)
+    (lambda (x) (/ (+ (f (- x dx)) (f x) (f (+ x dx))) 3)))
+
+(define (n-smoothed f n)
+    ((repeated smooth n) f))
+
+
+
+; ---------------------------------
+; Exercise 1.45
+; ---------------------------------
+
+(define (nth-root x n)
+    (define k (floor (log n 2)))                            ; got this from AI
+    (define nth-f (lambda (y) (/ x (expt y (- n 1)))))
+    (fixed-point
+        ((repeated average-damp k) nth-f)
+        1.0))
+
+
+
+; ---------------------------------
+; Exercise 1.46
+; ---------------------------------
+
+(define (iterative-improve good-enough? improve-guess)
+    (lambda (guess)
+        (let ((next (improve-guess guess)))
+            (if (good-enough? guess next)
+                next
+                ((iterative-improve good-enough? improve-guess) next)))))
+
+(define (fixed-point-iter f)
+    (define tolerance 0.00001)
+    (define (close-enough? v1 v2)
+        (< (abs (- v1 v2))
+        tolerance))
+    (iterative-improve close-enough? f))
